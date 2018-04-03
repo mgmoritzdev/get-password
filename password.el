@@ -1,12 +1,20 @@
+(defvar password-file "keys.json.gpg")
+
 (defun moritz/get-password-and-run-callback (callback)
   "Get password and run callback"
   (let ((keys (with-temp-buffer
-                (insert-file-contents "~/.gnupg/ptmkeys.json.gpg")
+                (insert-file-contents password-file)
+                (search-forward "[")
+                (beginning-of-line)
                 (buffer-string)
                 (json-read))))
+    (setq my-keys keys)
     (let ((keys-helm-source
            `((name . "Select a key: ")
-             (candidates . ,(mapcar '(lambda (element) `(,(cdr (assoc 'name element)) . ,element))
+             (candidates . ,(mapcar '(lambda (element)
+                                       `(,(string-join
+                                           `(,(cdr (assoc 'name element))
+                                             ,(cdr (assoc 'user element))) " - ") . ,element))
                                     keys))
              (action . callback))))
       (helm :sources '(keys-helm-source)))))
