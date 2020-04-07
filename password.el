@@ -1,5 +1,5 @@
-(defvar password-file "keys.json.gpg")
 (require 'json)
+(defvar password-file  (expand-file-name "~/.gnupg/passwords.gpg"))
 
 (defun moritz/get-password-and-run-callback (callback)
   "Get password and run callback"
