@@ -24,12 +24,12 @@
 ;; :PROPERTIES:
 ;; :header-args: :results table
 ;; :header-args+: :config (sqlcreds-setconfig 'config 'my-postgres)
-;; :header-args+: :engine (sql-get-config-prop config 'sql-product)
-;; :header-args+: :dbhost (sql-get-config-prop config 'sql-server)
-;; :header-args+: :dbport (sql-get-config-prop config 'sql-port)
-;; :header-args+: :database (sql-get-config-prop config 'sql-database)
-;; :header-args+: :dbuser (sql-get-config-prop config 'sql-user)
-;; :header-args+: :dbpassword (sql-get-config-prop config 'sql-password)
+;; :header-args+: :engine (sqlcreds-get-property config 'sql-product)
+;; :header-args+: :dbhost (sqlcreds-get-property config 'sql-server)
+;; :header-args+: :dbport (sqlcreds-get-property config 'sql-port)
+;; :header-args+: :database (sqlcreds-get-property config 'sql-database)
+;; :header-args+: :dbuser (sqlcreds-get-property config 'sql-user)
+;; :header-args+: :dbpassword (sqlcreds-get-property config 'sql-password)
 ;; :END:
 ;;
 ;; #+BEGIN_SRC sql
@@ -40,12 +40,12 @@
 ;; :PROPERTIES:
 ;; :header-args: :results table
 ;; :header-args+: :config (sqlcreds-setconfig 'config 'my-sql-server)
-;; :header-args+: :engine (sql-get-config-prop config 'sql-product)
-;; :header-args+: :dbhost (sql-get-config-prop config 'sql-server)
-;; :header-args+: :dbport (sql-get-config-prop config 'sql-port)
-;; :header-args+: :database (sql-get-config-prop config 'sql-database)
-;; :header-args+: :dbuser (sql-get-config-prop config 'sql-user)
-;; :header-args+: :dbpassword (sql-get-config-prop config 'sql-password)
+;; :header-args+: :engine (sqlcreds-get-property config 'sql-product)
+;; :header-args+: :dbhost (sqlcreds-get-property config 'sql-server)
+;; :header-args+: :dbport (sqlcreds-get-property config 'sql-port)
+;; :header-args+: :database (sqlcreds-get-property config 'sql-database)
+;; :header-args+: :dbuser (sqlcreds-get-property config 'sql-user)
+;; :header-args+: :dbpassword (sqlcreds-get-property config 'sql-password)
 ;; :END:
 ;;
 ;; #+BEGIN_SRC sql
@@ -67,7 +67,7 @@
                                       `(,(caar item) . ,(cdar item)))
                                     (json-read))))))
 
-(defun sql-get-config-prop (config property)
+(defun sqlcreds-get-property (config property)
   (cdr (assoc property config)))
 
 (defun sqlcreds-setconfig (variable config)
