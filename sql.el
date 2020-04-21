@@ -67,8 +67,28 @@
                                       `(,(caar item) . ,(cdar item)))
                                     (json-read))))))
 
+(defun moritz/decrypt-keys(key)
+  (interactive)
+  (let ((default-directory "~/.gnupg"))
+    (if (file-exists-p "decrypt.sh")
+        (shell-command (format "./decrypt.sh %s" key) "decrypt-output")
+      (error "decrypt script is missing"))))
+
+(defun sqlcreds--require-certs (config-variable connection-name)
+  (if (and (sqlcreds-get-property (eval config-variable) 'sql-sslmode)
+           (not (file-exists-p (concat "/tmp/" (symbol-name connection-name)))))
+      (moritz/decrypt-keys connection-name)))
+
+
 (defun sqlcreds-get-property (config property)
   (cdr (assoc property config)))
 
-(defun sqlcreds-setconfig (variable config)
-  (set (make-local-variable variable) (sqlcreds-get-config config)))
+(defun sqlcreds-setconfig (config-variable connection-name)
+  (if (local-variable-p config-variable)
+      (set config-variable
+           (sqlcreds-get-config connection-name))
+    (set (make-local-variable config-variable)
+         (sqlcreds-get-config connection-name)))
+  (sqlcreds--require-certs config-variable connection-name))
+
+;; (set (make-local-variable 'config) (sqlcreds-get-config 'cdp-dev))
