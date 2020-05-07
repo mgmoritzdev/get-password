@@ -1,14 +1,20 @@
 (require 'json)
-(defvar password-file  (expand-file-name "~/.gnupg/passwords.gpg"))
+(require 'subr-x)
 
-(defun moritz/get-password-and-run-callback (callback)
+(defvar mopass--filename (expand-file-name "~/.gnupg/passwords.gpg"))
+(defvar mopass-dir  (expand-file-name "~/.gnupg"))
+
+(defun mopass--get-password-and-run-callback (callback &optional override-file)
   "Get password and run callback"
-  (let ((keys (with-temp-buffer
-                (insert-file-contents password-file)
-                (search-forward "[")
-                (beginning-of-line)
-                (buffer-string)
-                (json-read))))
+  (let* ((mopass--filename (if override-file
+                               override-file
+                             mopass--filename))
+         (keys (with-temp-buffer
+                 (insert-file-contents mopass--filename)
+                 (search-forward "[")
+                 (beginning-of-line)
+                 (buffer-string)
+                 (json-read))))
     (let ((keys-helm-source
            `((name . "Select a key: ")
              (candidates . ,(mapcar #'(lambda (element)
@@ -19,20 +25,30 @@
              (action . callback))))
       (helm :sources '(keys-helm-source)))))
 
-(defun moritz/copy-password-to-kill-ring ()
-  "Get password and copy it to kill-ring"
-  (interactive)
-  (moritz/get-password-and-run-callback
-   'moritz/parse-password-and-copy-to-kill-ring))
+(defun mopass-copy-password-to-kill-ring (arg)
+  "Get password and copy it to kill-ring. With `arg' let
+you choose the passwords file"
+  (interactive "P")
+  (let ((filename
+         (if arg
+             (read-file-name "Select passwords file: " mopass-dir))))
+    (mopass--get-password-and-run-callback
+     'mopass--parse-password-and-copy-to-kill-ring
+     filename)))
 
-(defun moritz/insert-password ()
-  "Get password and insert it in the current position"
-  (interactive)
-  (moritz/get-password-and-run-callback
-   'moritz/parse-password-and-insert))
+(defun mopass-insert-password (arg)
+  "Get password and insert it in the current position. With `arg' let
+you choose the passwords file"
+  (interactive "P")
+  (let ((filename
+         (if arg
+             (read-file-name "Select passwords file: " mopass-dir))))
+    (mopass--get-password-and-run-callback
+     'mopass--parse-password-and-insert
+     filename)))
 
-(defun moritz/parse-password-and-copy-to-kill-ring (candidate)
+(defun mopass--parse-password-and-copy-to-kill-ring (candidate)
   (kill-new (cdr (assoc 'password candidate))))
 
-(defun moritz/parse-password-and-insert (candidate)
+(defun mopass--parse-password-and-insert (candidate)
   (insert (cdr (assoc 'password candidate))))
