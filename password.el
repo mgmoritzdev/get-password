@@ -52,3 +52,5 @@ you choose the passwords file"
 
 (defun mopass--parse-password-and-insert (candidate)
   (insert (cdr (assoc 'password candidate))))
+
+(defalias 'mopass 'mopass-copy-password-to-kill-ring)
