@@ -4,6 +4,22 @@
 (defvar mopass--filename (expand-file-name "~/.gnupg/passwords.gpg"))
 (defvar mopass-dir  (expand-file-name "~/.gnupg"))
 
+(defun mopass--get-password-by-name (name &optional override-file)
+  "Return the password the exact matching name"
+  (let* ((mopass--filename (if override-file
+                               override-file
+                             mopass--filename))
+         (keys (with-temp-buffer
+                 (insert-file-contents mopass--filename)
+                 (search-forward "[")
+                 (beginning-of-line)
+                 (buffer-string)
+                 (json-read))))
+    (alist-get 'password (elt (cl-remove-if-not
+                               (lambda (element)
+                                 (equal (cdr (assoc 'name element)) name))
+                               keys) 0))))
+
 (defun mopass--get-password-and-run-callback (callback &optional override-file)
   "Get password and run callback"
   (let* ((mopass--filename (if override-file
