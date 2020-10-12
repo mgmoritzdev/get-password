@@ -41,6 +41,43 @@
              (action . callback))))
       (helm :sources '(keys-helm-source)))))
 
+
+(defun mopass--get-passwords (&optional override-file)
+  "Get password and run callback"
+  (let* ((mopass--filename (if override-file
+                               override-file
+                             mopass--filename))
+         (keys (with-temp-buffer
+                 (insert-file-contents mopass--filename)
+                 (search-forward "[")
+                 (beginning-of-line)
+                 (buffer-string)
+                 (json-read))))
+    keys))
+
+(defun mopass--candidates-function (str pred _)
+  (let* ((candidates (mopass--get-passwords))
+         (keys (mapcar #'(lambda (element)
+                           `(,(string-join
+                               `(,(cdr (assoc 'name element))
+                                 ,(cdr (assoc 'username element))) " - ") . ,element))
+                       candidates)))
+
+    (let ((cand-names (mapcar 'car keys))
+          (cand-targets (mapcar 'cdr keys)))
+      (cl-mapcar (lambda (s p) (propertize s 'property p))
+                 cand-names
+                 cand-targets))))
+
+(defun mopass-ivy-execute (cand)
+  (cdr (assoc 'password cand)))
+
+(defun mopass-ivy ()
+  (interactive)
+  (ivy-read "Remmina connections: "
+            #'mopass--candidates-function
+            :action 'mopass-ivy-execute))
+
 (defun mopass-copy-password-to-kill-ring (arg)
   "Get password and copy it to kill-ring. With `arg' let
 you choose the passwords file"
