@@ -1,5 +1,7 @@
 (require 'json)
 (require 'subr-x)
+(require 'helm)
+(require 'ivy)
 
 (defvar mopass--filename (expand-file-name "~/.gnupg/passwords.gpg"))
 (defvar mopass-dir  (expand-file-name "~/.gnupg"))
@@ -107,3 +109,4 @@ you choose the passwords file"
   (insert (cdr (assoc 'password candidate))))
 
 (defalias 'mopass 'mopass-copy-password-to-kill-ring)
+(defalias 'mopass-get 'mopass--get-password-by-name)
