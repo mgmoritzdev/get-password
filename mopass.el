@@ -118,3 +118,5 @@ you choose the passwords file"
 
 (defalias 'mopass 'mopass-copy-password-to-kill-ring)
 (defalias 'mopass-get 'mopass--get-password-by-name)
+
+(provide 'mopass)
