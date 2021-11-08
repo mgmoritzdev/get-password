@@ -7,7 +7,8 @@
 (defvar mopass-dir  (expand-file-name "~/.gnupg"))
 
 (defun mopass--get-prop-by-name (name prop &optional override-file)
-  "Return the property with exact matching name"
+  "Return the property with exact matching name
+e.g.: (mopass--get-prop-by-name \"snapchat\" 'token \"~/.gnupg/file.json.gpg\")"
   (let* ((mopass--filename (if override-file
                                override-file
                              mopass--filename))
