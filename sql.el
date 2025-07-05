@@ -83,6 +83,10 @@
 (defun sqlcreds-get-property (config property)
   (cdr (assoc property config)))
 
+(defun sqlcreds-get-property-by (connection-name property)
+  (let ((config (sqlcreds-get-config connection-name)))
+    (cdr (assoc property config))))
+
 (defun sqlcreds-setconfig (config-variable connection-name)
   (if (local-variable-p config-variable)
       (set config-variable

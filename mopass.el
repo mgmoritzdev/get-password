@@ -9,6 +9,11 @@
 (defun mopass--get-prop-by-name (name prop &optional override-file)
   "Return the property with exact matching name
 e.g.: (mopass--get-prop-by-name \"snapchat\" 'token \"~/.gnupg/file.json.gpg\")"
+  (mopass--get-prop-by prop 'name name))
+
+(defun mopass--get-prop-by (prop search-prop search-value &optional override-file)
+  "Return the `prop' of entry with `search-prop' = `search-value'
+e.g.: (mopass--get-prop-by-name \"snapchat\" 'token \"~/.gnupg/file.json.gpg\")"
   (let* ((mopass--filename (if override-file
                                override-file
                              mopass--filename))
@@ -19,9 +24,9 @@ e.g.: (mopass--get-prop-by-name \"snapchat\" 'token \"~/.gnupg/file.json.gpg\")"
                  (buffer-string)
                  (json-read))))
     (alist-get prop (elt (cl-remove-if-not
-                               (lambda (element)
-                                 (equal (cdr (assoc 'name element)) name))
-                               keys) 0))))
+                          (lambda (element)
+                            (equal (cdr (assoc search-prop element)) search-value))
+                          keys) 0))))
 
 (defun mopass--get-password-by-name (name &optional override-file)
   "Return the password the exact matching name"
@@ -112,7 +117,9 @@ you choose the passwords file"
      filename)))
 
 (defun mopass--parse-password-and-copy-to-kill-ring (candidate)
-  (kill-new (cdr (assoc 'password candidate))))
+  (let ((pass (cdr (assoc 'password candidate))))
+    ;; (shell-command (concat "echo -n '" pass "' | xclip -selection clipboard &> /dev/null"))
+    (kill-new pass)))
 
 (defun mopass--parse-password-and-insert (candidate)
   (insert (cdr (assoc 'password candidate))))

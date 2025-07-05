@@ -59,8 +59,9 @@
     (dotimes (i remainder)
       (let ((index (% (abs (random)) (length char-pool))))
         (setq result (append result `(,(substring char-pool index (1+ index)))))))
-    (setq result (shuffle result))
-    (kill-new (mapconcat 'concat result ""))))
+    (setq result (mapconcat 'concat (shuffle result) ""))
+    (kill-new result)
+    result))
 
 (defun passgen--get (symbol)
   (let* ((result)
